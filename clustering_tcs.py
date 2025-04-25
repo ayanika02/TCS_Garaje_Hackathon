@@ -3,31 +3,37 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Load data
-st.title("Clustering Dashboard")
-data = pd.read_csv("C:/Users/Diya/clustered.csv")  # or generate it live
+st.title("Clustering Dashboard - All Clusters")
+data = pd.read_csv("C:/Users/Diya/clustered.csv") 
 
-# Sidebar options
-cluster_to_view = st.sidebar.selectbox("Select Cluster", sorted(data['Cluster'].unique()))
+st.write("First 5 rows of your data:")
+st.write(data.head())
 
-st.subheader(f"Distribution of Categorical Features for Cluster {cluster_to_view}")
-filtered_data = data[data['Cluster'] == cluster_to_view]
+if 'Cluster' in data.columns:
+    st.write("The 'Cluster' column exists.")
+    st.write(f"Unique values in 'Cluster': {data['Cluster'].unique()}")
+else:
+    st.error("Error: The 'Cluster' column is missing in your CSV file.")
+    st.stop()
 
-# Plotting
-for col in ['Sex', 'Housing', 'Saving accounts', 'Checking account', 'Purpose', 'Job']:
-    fig, ax = plt.subplots()
-    sns.countplot(x=col, data=filtered_data, ax=ax)
-    plt.xticks(rotation=45)
-    st.pyplot(fig)
-    
-st.subheader("Numerical Feature Distributions by Cluster")
-
+categorical_cols = ['Sex', 'Housing', 'Saving accounts', 'Checking account', 'Purpose', 'Job']
 numerical_features = ['Age', 'Credit amount', 'Duration']
 
+
+st.header("Categorical Feature Distributions Across All Clusters")
+for col in categorical_cols:
+    st.subheader(f"Distribution of {col}")
+    fig, ax = plt.subplots()
+    sns.countplot(x=col, data=data, hue='Cluster', palette='viridis', ax=ax)
+    plt.xticks(rotation=45, ha='right')
+    st.pyplot(fig)
+
+st.header("Numerical Feature Distributions Across All Clusters")
 for feature in numerical_features:
+    st.subheader(f"Distribution of {feature}")
     fig, ax = plt.subplots(figsize=(8, 6))
-    sns.boxplot(x='Cluster', y=feature, data= data, palette='viridis', ax=ax)
-    ax.set_title(f'{feature} Distribution by Cluster')
+    sns.boxplot(y=feature, x='Cluster', data=data, palette='viridis', ax=ax)
+    ax.set_title(f'{feature} Distribution Across All Clusters')
     ax.set_xlabel('Cluster')
     ax.set_ylabel(feature)
     st.pyplot(fig)
